@@ -16,11 +16,18 @@ The notebook also checks the common workspace-root location `deliverable_1/data/
 - Standardized column names, trimmed and collapsed whitespace in text fields, converted age and billing amount to numeric, parsed admission/discharge dates, and derived length of stay. Exact duplicate rows were removed; no invalid ages, unparseable dates, or negative stays were found.
 - Category labels are preserved in their canonical spelling; for example, `AB+` and `UnitedHealthcare` are not changed by title-casing.
 - No imputation was necessary because the inspected fields have no missing values. IQR review flags no outliers in age, billing amount, or length of stay. Separately, 108 raw billing amounts are negative, with 106 remaining after duplicate removal. These are retained for review because the dataset does not explain whether negative bills represent errors or adjustments; IQR alone cannot determine that.
-- Excluded name, doctor, hospital, and room number from the analytical frame. The cleaned analytical CSV contains 54,966 rows and 12 columns.
-- Test results are nearly balanced: 33.5% Abnormal, 33.3% Normal, and 33.1% Inconclusive.
-- Numeric correlations are near zero; the largest absolute pairwise correlation among age, billing amount, and length of stay is about 0.008. The EDA shows no strong linear relationships, so later predictive models should be compared with simple baselines.
-- Median billing varies by medical condition (about $24,911 for Cancer to $26,146 for Obesity), but this is descriptive only and not strong evidence of a meaningful difference. The dataset is synthetic.
-- Six visualizations (numeric distributions, category counts, billing by condition, and a numeric correlation heatmap) display inline in the notebook; no separate figures folder is used.
+- Excluded name, doctor, hospital, and room number from the analytical frame. The cleaned analytical table contains 54,966 rows and 12 columns.
+- Length of stay is spread fairly evenly across 1–30 days. Admissions are also distributed fairly evenly across the six medical conditions and three admission types.
+- Age, billing amount, and length of stay have very weak linear relationships with one another. The largest absolute pairwise correlation is about 0.008.
+- Median billing ranges from about $24,911 for Cancer to $26,146 for Obesity. The roughly $1,235 gap is small relative to the overall billing interquartile range of about $24,576.
+- Test results are nearly balanced overall at 33.54% Abnormal, 33.35% Normal, and 33.11% Inconclusive. The largest difference between a subgroup rate and its overall rate is 1.01 percentage points, for Abnormal results among hypertension admissions (32.53% compared with 33.54% overall). The largest differences by age group and admission type are 0.87 and 0.34 percentage points, respectively.
+- Six figures and the test-result comparison table are saved inline. The full results are in the notebook’s Findings and Interpretation section. [Deliverable_1_EDA.ipynb](Deliverable_1_EDA.ipynb)
+
+## Modeling next steps
+
+The proposed prediction task uses age and admission type to estimate whether the recorded test result will be Abnormal, Normal, or Inconclusive. Medical condition is eligible only if it was recorded by admission. Exclude discharge date, length of stay, and billing amount because their recorded values may reflect information from later in the stay.
+
+The small subgroup differences make a majority-class baseline a useful benchmark. Fit that baseline and a multinomial logistic regression on earlier admissions, then compare their accuracy and macro F1 on later admissions. The 33.54% overall share for Abnormal is a descriptive reference. Calculate the baseline's held-out accuracy using the majority class from the training data.
 
 ## Challenges and decisions
 
